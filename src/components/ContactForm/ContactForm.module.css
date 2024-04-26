@@ -1,0 +1,30 @@
+.formWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid white; */
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.607);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 0 auto 30px;
+    max-width: 360px;
+}
+
+.inputBlock {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+}
+
+.input:focus,
+.input:hover {
+    outline: none;
+    border-color: var(--main-color-hover);
+}

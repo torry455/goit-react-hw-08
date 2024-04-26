@@ -1,0 +1,6 @@
+.phonebook {
+    color: var(--main-color);
+    text-align: center;
+    font-size: 36px;
+    margin: 0 20px 20px;
+}

@@ -1,88 +1,84 @@
-import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 import {
-  apiGetContacts,
-  apiPostContacts,
-  apiDeleteContacts,
-} from './contactsOps';
+  fetchContacts,
+  deleteContact,
+  addContact,
+  editContact,
+} from "./operations";
+import toast from "react-hot-toast";
+import { logout } from "../auth/operations";
 
-const contactsInitialState = {
-  contacts: {
-    items: [],
-    loading: false,
-    error: null,
-  },
-  filters: {
-    name: '',
-  },
+const initialContacts = {
+  contacts: { items: [], loading: false, error: null, edit: false },
 };
 
-const contactsSlice = createSlice({
-  name: 'contacts',
-  initialState: contactsInitialState,
-  reducers: {
-    changeFilter(state, action) {
-      state.filters.name = action.payload;
-    },
-  },
-  extraReducers: builder => {
+export const slice = createSlice({
+  name: "contacts",
+  initialState: initialContacts,
+  extraReducers: (builder) => {
     builder
-      .addCase(apiGetContacts.pending, state => {
+      .addCase(logout.pending, (state) => {
+        state.contacts.items = [];
+      })
+      .addCase(fetchContacts.fulfilled, (state, { payload }) => {
+        state.contacts.items = payload;
+        state.contacts.loading = false;
+      })
+      .addCase(fetchContacts.pending, (state) => {
         state.contacts.loading = true;
-        state.contacts.error = false;
       })
-      .addCase(apiGetContacts.fulfilled, (state, action) => {
+      .addCase(fetchContacts.rejected, (state, { payload }) => {
         state.contacts.loading = false;
-        state.contacts.items = action.payload;
-      })
-      .addCase(apiGetContacts.rejected, state => {
-        state.contacts.loading = false;
-        state.contacts.error = true;
+        state.contacts.error = payload;
       })
 
-      .addCase(apiPostContacts.pending, state => {
-        state.contacts.loading = true;
-        state.contacts.error = false;
-      })
-      .addCase(apiPostContacts.fulfilled, (state, action) => {
-        state.contacts.loading = false;
-        state.contacts.items.push(action.payload);
-      })
-      .addCase(apiPostContacts.rejected, state => {
-        state.contacts.loading = false;
-        state.contacts.error = true;
-      })
-
-      .addCase(apiDeleteContacts.pending, state => {
-        state.contacts.loading = true;
-        state.contacts.error = false;
-      })
-      .addCase(apiDeleteContacts.fulfilled, (state, action) => {
-        state.contacts.loading = false;
+      .addCase(deleteContact.fulfilled, (state, { payload }) => {
         state.contacts.items = state.contacts.items.filter(
-          contact => contact.id !== action.payload.id
+          (contact) => contact.id !== payload
         );
-      })
-      .addCase(apiDeleteContacts.rejected, state => {
         state.contacts.loading = false;
-        state.contacts.error = true;
+        toast.success("Contact successfully deleted!");
+      })
+      .addCase(deleteContact.pending, (state) => {
+        state.contacts.loading = true;
+      })
+      .addCase(deleteContact.rejected, (state, { payload }) => {
+        state.contacts.loading = false;
+        state.contacts.error = payload;
+      })
+
+      .addCase(addContact.fulfilled, (state, { payload }) => {
+        state.contacts.items.push(payload);
+        state.contacts.loading = false;
+        toast.success("Contact successfully created!");
+      })
+      .addCase(addContact.pending, (state) => {
+        state.contacts.loading = true;
+      })
+      .addCase(addContact.rejected, (state, { payload }) => {
+        state.contacts.loading = false;
+        state.contacts.error = payload;
+      })
+
+      .addCase(editContact.fulfilled, (state, { payload }) => {
+        const editer = state.contacts.items.find(
+          (contact) => contact.id === payload.id
+        );
+        editer.name = payload.name;
+        editer.number = payload.number;
+        state.contacts.edit = false;
+        state.contacts.loading = false;
+        toast.success("Contact successfully edited!");
+      })
+      .addCase(editContact.pending, (state) => {
+        state.contacts.loading = true;
+        state.contacts.edit = true;
+      })
+      .addCase(editContact.rejected, (state, { payload }) => {
+        state.contacts.loading = false;
+        state.contacts.error = payload;
       });
   },
 });
 
-export const selectContacts = state => state.contacts.items;
-export const selectLoading = state => state.contacts.loading;
-export const selectError = state => state.contacts.error;
-export const selectContactsFilter = state => state.filters.name;
-export const selectFilteredContacts = createSelector(
-  [selectContacts, selectContactsFilter],
-  (contacts, filter) => {
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.trim().toLowerCase())
-    );
-  }
-);
-
-export const { changeFilter } = contactsSlice.actions;
-export const filtersReducer = contactsSlice.reducer;
-
-export const contactsReducer = contactsSlice.reducer;
+export const contactsReducer = slice.reducer;

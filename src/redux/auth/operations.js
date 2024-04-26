@@ -1,50 +1,55 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import * as authService from 'services/auth'; // assuming you have a service for authentication
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { LogIn, clearToken, setToken } from "../../api/api";
 
 export const register = createAsyncThunk(
-  'auth/register',
-  async (userData, { rejectWithValue }) => {
+  "auth/register",
+  async (credentionals, thunkAPI) => {
     try {
-      const response = await authService.register(userData);
-      return response.data;
+      const data = await LogIn.post("/users/signup", credentionals);
+      setToken(data.data.token);
+      return data.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(alert(error.message));
     }
   }
 );
 
 export const login = createAsyncThunk(
-  'auth/login',
-  async (userData, { rejectWithValue }) => {
+  "auth/login",
+  async (credentionals, thunkAPI) => {
     try {
-      const response = await authService.login(userData);
-      return response.data;
+      const data = await LogIn.post("/users/login", credentionals);
+      setToken(data.data.token);
+      return data.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(alert(error.message));
     }
   }
 );
 
-export const logout = createAsyncThunk(
-  'auth/logout',
-  async (_, { rejectWithValue }) => {
-    try {
-      await authService.logout();
-      return null;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+export const logout = createAsyncThunk("auth/logout", async (thunkAPI) => {
+  try {
+    await LogIn.post("/users/logout");
+
+    clearToken();
+  } catch (error) {
+    return thunkAPI.rejectWithValue(alert(error.message));
   }
-);
+});
 
 export const refreshUser = createAsyncThunk(
-  'auth/refresh',
-  async (_, { rejectWithValue }) => {
+  "auth/refresh",
+  async (_, thunkAPI) => {
+    const savedToken = thunkAPI.getState().auth.token;
+    if (!savedToken) {
+      return thunkAPI.rejectWithValue("Unable to fetch user");
+    }
+    setToken(savedToken);
     try {
-      const response = await authService.refreshUser();
-      return response.data;
+      const data = await LogIn.get("/users/current");
+      return data.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(alert(error.message));
     }
   }
 );
