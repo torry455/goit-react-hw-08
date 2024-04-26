@@ -1,11 +1,7 @@
 .SearchBox {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+
     max-width: 360px;
-    /* border: 1px solid white; */
+
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.607);
     border-radius: 20px;
     padding: 20px;
@@ -15,7 +11,7 @@
 
 .input {
     padding: 8px;
-    margin-top: 4px;
+    margin-top: 10px;
     border: 1px solid #000000;
     border-radius: 4px;
 }

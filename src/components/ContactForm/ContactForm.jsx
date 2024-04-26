@@ -10,13 +10,13 @@ const SignupSchema = yup.object().shape({
     .trim()
     .min(2, "Too Short!")
     .max(20, "Too Long!")
-    .required("fild Required!"),
+    .required("Field Required!"),
   number: yup
     .string()
     .trim()
     .min(2, "Too Short!")
     .max(20, "Too Long!")
-    .required("fild Required!"),
+    .required("Field Required!"),
 });
 
 function ContactForm() {
