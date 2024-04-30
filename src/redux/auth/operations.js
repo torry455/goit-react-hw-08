@@ -47,6 +47,8 @@ export const refreshUser = createAsyncThunk(
     setToken(savedToken);
     try {
       const data = await LogIn.get("/users/current");
+      console.log(data); // Вивести отримані дані у відповідь від сервера
+
       return data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(alert(error.message));
